@@ -5,6 +5,7 @@ const gm = require('gm');
 const moment = require('moment');
 const request = require('request');
 const iconv = require('iconv-lite');
+const Bmp = require('binary-bmp');
 const config = require('./config');
 
 class Memobird {
@@ -96,25 +97,26 @@ class Memobird {
 
   // 打印文字
   async printText(text) {
-    return await this.print(this.encodeText(text));
+    return await this.print(Memobird.encodeText(text));
   }
-  encodeText(text) {
+  static encodeText(text) {
     return `T:${iconv.encode(`${text}\n`, 'gbk').toString('base64')}`;
   }
 
-  // 打印位图
-  async printBmp(base64) {
-    return await this.print(this.encodeBmp(base64));
+  // 打印Canvas
+  async printCanvas(canvas) {
+    return await this.printBmp(Memobird.encodeCanvas(canvas));
   }
-  encodeBmp(base64) {
-    return `P:${base64}`;
+  static encodeCanvas(canvas) {
+    const binary = new Bmp(Bmp.BINARY, canvas);
+    return `P:${binary.getBase64(true)}`;
   }
 
   // 根据图片路径打印
   async printImage(imagePath, width) {
-    return await this.print(await this.encodeImage(imagePath, width));
+    return await this.print(await Memobird.encodeImage(imagePath, width));
   }
-  encodeImage(imagePath, width) {
+  static encodeImage(imagePath, width) {
     return new Promise(function(resolve, reject) {
       // 处理图片
       function data2base64(data) {

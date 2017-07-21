@@ -29,6 +29,7 @@
   "bundleDependencies": false,
   "dependencies": {
     "babel-runtime": "^6.23.0",
+    "binary-bmp": "0.0.3",
     "gm": "^1.23.0",
     "iconv-lite": "^0.4.18",
     "moment": "^2.18.1",
