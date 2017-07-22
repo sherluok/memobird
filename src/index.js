@@ -105,7 +105,7 @@ class Memobird {
 
   // 打印Canvas
   async printCanvas(canvas) {
-    return await this.printBmp(Memobird.encodeCanvas(canvas));
+    return await this.print(Memobird.encodeCanvas(canvas));
   }
   static encodeCanvas(canvas) {
     const binary = new Bmp(Bmp.BINARY, canvas);

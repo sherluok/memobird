@@ -52,6 +52,7 @@
     "url": "git+https://github.com/sherluok/node-memobird.git"
   },
   "scripts": {
+    "watch": "babel src -d lib -w",
     "build": "babel src -d lib"
   },
   "version": "0.0.5",

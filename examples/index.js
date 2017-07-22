@@ -1,9 +1,15 @@
 const Memobird = require('../');
 
+// const memobird = new Memobird({
+//   ak: 'xxxxxxxxxxxxxxxx',
+//   memobirdID: 'xxxxxxxx',
+//   useridentifying: 'xxx',
+// });
+
 const memobird = new Memobird({
-  ak: 'xxxxxxxxxxxxxxxx',
-  memobirdID: 'xxxxxxxx',
-  useridentifying: 'xxx',
+  ak: 'bfabe37c70a140be91c59fed5e12a677',
+  memobirdID: 'de1b9db62ec553c1',
+  useridentifying: '781543',
 });
 
 memobird.init()
@@ -19,13 +25,13 @@ memobird.init()
 
   // 一次性打印多个
   .then(() => memobird.print(
-    memobird.encodeText('你好咕咕机，能不能一次性打印所有东西？'),
-    memobird.encodeText('第一张图片：'),
-    memobird.encodeImage('https://assets-cdn.github.com/images/modules/logos_page/GitHub-Mark.png', 50),
-    memobird.encodeText('第二张图片：'),
-    memobird.encodeImage('https://assets-cdn.github.com/images/modules/logos_page/GitHub-Mark.png', 100),
-    memobird.encodeText('第三张图片：'),
-    memobird.encodeImage('https://assets-cdn.github.com/images/modules/logos_page/GitHub-Mark.png')
+    Memobird.encodeText('你好咕咕机，能不能一次性打印所有东西？'),
+    Memobird.encodeText('第一张图片：'),
+    Memobird.encodeImage('https://assets-cdn.github.com/images/modules/logos_page/GitHub-Mark.png', 50),
+    Memobird.encodeText('第二张图片：'),
+    Memobird.encodeImage('https://assets-cdn.github.com/images/modules/logos_page/GitHub-Mark.png', 100),
+    Memobird.encodeText('第三张图片：'),
+    Memobird.encodeImage('https://assets-cdn.github.com/images/modules/logos_page/GitHub-Mark.png')
 	))
   // 每3000毫秒获取一次打印状态，如果显示未打印则继续获取，当获取到结果为已打印的状态或总用时超出15000毫秒，则终止并返回结果
   .then(printcontentid => memobird.watch(printcontentid, 3000, 15000))

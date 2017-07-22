@@ -3,12 +3,12 @@
 
 * [安装](#安装)
 * [使用](#使用)
-	* [打印文字](#打印文字)
-	* [打印图片](#打印图片)
-	* [打印Canvas](#打印canvas)
+* [打印](#打印)
+	* [文字](#打印文字)
+	* [图片](#打印图片)
+	* [canvas](#打印canvas)
 	* [一次打印多个](#一次打印多个)
 	* [获取打印状态](#获取打印状态)
-* [参数](#参数)
 * [示例](#示例)
 
 ## 安装
@@ -28,6 +28,8 @@ const memobird = new Memobird({
   useridentifying: 'xxx',
 });
 ```
+
+## 打印
 
 ### 打印文字
 `printText(text)` 方法可以打印文字。
@@ -53,7 +55,6 @@ memobird.init()
 > 很多场景下，我们需要打印更丰富的内容，本模块可以直接打印H5的canvas。如果你感兴趣，canvas转单色点位图的功能是通过我编写的模块[binary-bmp](https://github.com/sherluok/binary-bmp)实现的。
 
 `encodeCanvas(canvas)`静态方法可以将canvas转为单色点位图base64编码值。
-`printBmp(bmp)`方法可以打印单色点位图base64编码值。
 
 浏览器中:
 
