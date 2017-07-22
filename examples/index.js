@@ -1,15 +1,9 @@
 const Memobird = require('../');
 
-// const memobird = new Memobird({
-//   ak: 'xxxxxxxxxxxxxxxx',
-//   memobirdID: 'xxxxxxxx',
-//   useridentifying: 'xxx',
-// });
-
 const memobird = new Memobird({
-  ak: 'bfabe37c70a140be91c59fed5e12a677',
-  memobirdID: 'de1b9db62ec553c1',
-  useridentifying: '781543',
+  ak: 'xxxxxxxxxxxxxxxx',
+  memobirdID: 'xxxxxxxx',
+  useridentifying: 'xxx',
 });
 
 memobird.init()

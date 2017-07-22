@@ -52,18 +52,19 @@ memobird.init()
 ```
 
 ### 打印Canvas
-> 很多场景下，我们需要打印更丰富的内容，本模块可以直接打印H5的canvas。如果你感兴趣，canvas转单色点位图的功能是通过我编写的模块[binary-bmp](https://github.com/sherluok/binary-bmp)实现的。
-
-`encodeCanvas(canvas)`静态方法可以将canvas转为单色点位图base64编码值。
+> 很多场景下，我们需要打印更丰富的内容。可以结合我编写的模块[binary-bmp](https://github.com/sherluok/binary-bmp)打印H5的canvas，这个模块可以将canvas对象转为单色点位图base64编码值。得到编码值以后，传入`print`方法打印。
 
 浏览器中:
 
 ```javascript
-const Memobird = require('memobird');
+import Bmp from 'binary-bmp';
+
 const canvas = document.getElementById('canvas-id'); // 获取canvas对象
-const bmp = Memobird.encodeCanvas(canvas); // 将canvas转为单色点位图base64编码值
+const bitmap = new Bmp(Bmp.BINARY, canvas);
+const base64 = bitmap.flip().getBase64(true); // 将canvas转为单色点位图base64编码值
+const item = `P:${base64}`; // 咕咕机要求的格式: 'P:图片'
 // ...
-// 省略代码：将bmp的值传给服务器
+// 省略代码：将item的值传给服务器
 // ...
 ```
 
@@ -71,10 +72,10 @@ const bmp = Memobird.encodeCanvas(canvas); // 将canvas转为单色点位图base
 
 ```javascript
 // ...
-// 省略代码：接收客户端发来的bmp的值
+// 省略代码：接收客户端发来的item的值
 // ...
 memobird.init()
-  .then(() => memobird.print(bmp));
+  .then(() => memobird.print(item));
 ```
 
 
@@ -85,7 +86,6 @@ memobird.init()
 `print(item1, item2, ...)`方法可以一次性打印多个内容。<br>
 `encodeText(text)`静态方法可以将文本转为`print`方法可以处理的内容。<br>
 `encodeImage(image, width)`静态方法可以将图片转为`print`方法可以处理的内容。<br>
-`encodeCanvas(canvas)`静态方法可以将canvas对象转为`print`方法可以处理的内容。
 
 ```javascript
 memobird.init()
