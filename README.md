@@ -142,13 +142,13 @@ memobird.init()
 
   // 一次性打印多个
   .then(() => memobird.print(
-    memobird.encodeText('你好咕咕机，能不能一次性打印所有东西？'),
-    memobird.encodeText('第一张图片：'),
-    memobird.encodeImage('https://assets-cdn.github.com/images/modules/logos_page/GitHub-Mark.png', 50),
-    memobird.encodeText('第二张图片：'),
-    memobird.encodeImage('https://assets-cdn.github.com/images/modules/logos_page/GitHub-Mark.png', 100),
-    memobird.encodeText('第三张图片：'),
-    memobird.encodeImage('https://assets-cdn.github.com/images/modules/logos_page/GitHub-Mark.png')
+    Memobird.encodeText('你好咕咕机，能不能一次性打印所有东西？'),
+    Memobird.encodeText('第一张图片：'),
+    Memobird.encodeImage('https://assets-cdn.github.com/images/modules/logos_page/GitHub-Mark.png', 50),
+    Memobird.encodeText('第二张图片：'),
+    Memobird.encodeImage('https://assets-cdn.github.com/images/modules/logos_page/GitHub-Mark.png', 100),
+    Memobird.encodeText('第三张图片：'),
+    Memobird.encodeImage('https://assets-cdn.github.com/images/modules/logos_page/GitHub-Mark.png')
   ))
   .catch(error => console.log('打印出错了：', error));
 ```
