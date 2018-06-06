@@ -55,7 +55,7 @@
     "watch": "babel src -d lib -w",
     "build": "babel src -d lib"
   },
-  "version": "0.0.7",
+  "version": "0.0.8",
   "directories": {
     "example": "examples",
     "lib": "lib"
