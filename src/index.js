@@ -37,12 +37,16 @@ class Memobird {
         }, body),
       }, (error, response, body) => {
         const { statusCode } = response;
-        const data = JSON.parse(body);
-        const { showapi_res_code, showapi_res_error } = data;
-        if (error || statusCode !== 200 || showapi_res_code !== 1) {
-          reject({ error, statusCode, showapi_res_code, showapi_res_error });
-        } else {
-          resolve(data);
+        try {
+          const data = JSON.parse(body);
+          const { showapi_res_code, showapi_res_error } = data;
+          if (error || statusCode !== 200 || showapi_res_code !== 1) {
+            reject({ error, statusCode, showapi_res_code, showapi_res_error });
+          } else {
+            resolve(data);
+          }
+        } catch (error) {
+          reject({ error });
         }
       });
     });
