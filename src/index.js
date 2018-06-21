@@ -36,17 +36,25 @@ class Memobird {
           memobirdID: this.memobirdID,
         }, body),
       }, (error, response, body) => {
-        const { statusCode } = response;
-        try {
-          const data = JSON.parse(body);
-          const { showapi_res_code, showapi_res_error } = data;
-          if (error || statusCode !== 200 || showapi_res_code !== 1) {
-            reject({ error, statusCode, showapi_res_code, showapi_res_error });
-          } else {
-            resolve(data);
-          }
-        } catch (error) {
+        if (error) {
           reject({ error });
+        } else {
+          const { statusCode } = response || {};
+          if (statusCode !== 200) {
+            reject({ statusCode });
+          } else {
+            try {
+              const data = JSON.parse(body);
+              const { showapi_res_code, showapi_res_error } = data;
+              if (showapi_res_code !== 1) {
+                reject({ showapi_res_code, showapi_res_error });
+              } else {
+                resolve(data);
+              }
+            } catch(error) {
+              reject({ error });
+            }
+          }
         }
       });
     });
