@@ -5,9 +5,9 @@
 * 打印
 	* [文字](#打印文字)
 	* [图片](#打印图片)
-	* [url](#打印网页)
-	* [HTML](#打印 HTML)
-	* [CANVAS](#打印 CANVAS)
+	* [网页](#打印网页)
+	* [HTML](#打印Html)
+	* [CANVAS](#打印Canvas)
 	* [一次打印多个](#一次打印多个)
 	* [获取打印状态](#获取打印状态)
 * [示例](#示例)
@@ -97,7 +97,7 @@ memobird.init()
 	.then(() => memobird.printUrl('http://open.memobird.cn/Home/testview'))
 ```
 
-## 打印 HTML
+## 打印HTML
 
 `printHtml(htmlString)`
 
@@ -106,7 +106,7 @@ memobird.init()
 	.then(() => memobird.printHtml('<html><body><h1>Hello World!</h1></body></html>'))
 ```
 
-### 打印 Canvas
+### 打印Canvas
 
 > 很多场景下，我们需要打印更丰富的内容。<br>
 > 可以使用 canvas 精确控制自己想呈现的内容，并利用我编写的模块 [`binary-bmp`](https://github.com/sherluok/binary-bmp) 将 canvas 对象处理单色点位图 base64 编码值。得到编码值以后，传入 `print` 方法打印。canvas 可以是浏览器中的 `<canvas>` 或者 Node.js 中的实现的服务端 canvas 比如 [`node-canvas`](https://github.com/Automattic/node-canvas)。
