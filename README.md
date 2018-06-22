@@ -1,6 +1,6 @@
 # memobird
 咕咕机 Node.js SDK
-* [Updates](#Updates)
+* [Updates](#updates)
 * [安装和使用](#安装和使用)
 * 打印
 	* [文字](#打印文字)
