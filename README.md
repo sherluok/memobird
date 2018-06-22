@@ -6,8 +6,8 @@
 	* [文字](#打印文字)
 	* [图片](#打印图片)
 	* [网页](#打印网页)
-	* [HTML](#打印Html)
-	* [CANVAS](#打印Canvas)
+	* [Html](#打印Html)
+	* [Canvas](#打印Canvas)
 	* [一次打印多个](#一次打印多个)
 	* [获取打印状态](#获取打印状态)
 * [示例](#示例)
@@ -97,7 +97,7 @@ memobird.init()
 	.then(() => memobird.printUrl('http://open.memobird.cn/Home/testview'))
 ```
 
-## 打印HTML
+## 打印Html
 
 `printHtml(htmlString)`
 
