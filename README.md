@@ -109,7 +109,8 @@ memobird.init()
 ## 打印Canvas
 
 > 很多场景下，我们需要打印更丰富的内容。<br>
-> 可以使用 canvas 精确控制自己想呈现的内容，并利用我编写的模块 [`binary-bmp`](https://github.com/sherluok/binary-bmp) 将 canvas 对象处理单色点位图 base64 编码值。得到编码值以后，传入 `print` 方法打印。canvas 可以是浏览器中的 `<canvas>` 或者 Node.js 中的实现的服务端 canvas 比如 [`node-canvas`](https://github.com/Automattic/node-canvas)。
+> 可以使用 canvas 精确控制自己想呈现的内容，并利用我编写的模块 [`binary-bmp`](https://github.com/sherluok/binary-bmp) 将 canvas 对象处理单色点位图 base64 编码值。得到编码值以后，传入 `print` 方法打印。canvas 可以是浏览器中的 `<canvas>` 或者 Node.js 中的实现的服务端 canvas 比如 [`node-canvas`](https://github.com/Automattic/node-canvas)。<br>
+> 参考 [examples/canvas/server.js](./examples/canvas/server.js)
 
 浏览器中:
 
@@ -140,11 +141,11 @@ memobird.init()
 
 > 咕咕机每次打印一份内容都会留出上下间距，如果你不想看到这些上下间距可以选择一次性打印多个内容。
 
-`print(item1, item2, ...)`方法可以一次性打印多个内容。<br>
+`print(item1, item2, ...)`
 
 * `item`: 要打印的内容，是以 `encode` 开头命名的方法的返回值
 
-文字，图片，canvas 都有自己的 `encode` 方法:
+`encode` 类型方法:
 
 * `printText(text)` == `print(encodeText(text))`
 * `printImage(image, width)` == `print(encodeImage(image, width))`
@@ -194,7 +195,7 @@ memobird.init()
 
 ## 示例
 
-参考  [examples/server.js](./examples/server.js)
+参考 [examples/index.js](./examples/index.js)
 
 ```javascript
 const Memobird = require('../');
