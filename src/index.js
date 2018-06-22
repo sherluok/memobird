@@ -1,4 +1,5 @@
-'use strict';
+/* eslint-disable class-methods-use-this, newline-per-chained-call */
+/* eslint-disable no-await-in-loop, no-restricted-syntax */
 
 const fs = require('fs');
 const gm = require('gm');
@@ -10,15 +11,49 @@ const config = require('./config');
 
 class Memobird {
   static async sleep(time) {
-    return new Promise(function(resolve) {
-      setTimeout(resolve, time);
+    return new Promise(resolve => setTimeout(resolve, time));
+  }
+
+  // Memobird Required Text Format
+  static formatText(base64) {
+    return `T:${base64}`;
+  }
+
+  // Memobird Required Picture Format
+  static formatImage(base64) {
+    return `P:${base64}`;
+  }
+
+  // download remote image with a url
+  static getImageDataFromUrl(url) {
+    return new Promise((resolve, reject) => {
+      request(url, { encoding: null }, (error, response = {}, bodyBuffer) => {
+        if (error || response.statusCode !== 200) {
+          reject({ error, response });
+        } else {
+          resolve(bodyBuffer);
+        }
+      });
     });
   }
 
-  constructor(config = {}) {
-    this.ak = config.ak;
-    this.memobirdID = config.memobirdID;
-    this.useridentifying = config.useridentifying;
+  // convert image format using gm
+  static localImageConversion(data, width) {
+    return new Promise((resolve, reject) => {
+      gm(data).resize(width || 384).flip().type('Bilevel').colors(2).toBuffer('bmp', (error, buffer) => {
+        if (error) {
+          reject(error);
+        } else {
+          resolve(buffer.toString('base64'));
+        }
+      });
+    });
+  }
+
+  constructor(options = {}) {
+    this.ak = options.ak;
+    this.memobirdID = options.memobirdID;
+    this.useridentifying = options.useridentifying;
   }
 
   get timestamp() {
@@ -26,6 +61,7 @@ class Memobird {
   }
 
   // api请求
+  // api request
   post(type, body) {
     return new Promise((resolve, reject) => {
       request.post({
@@ -35,25 +71,20 @@ class Memobird {
           timestamp: this.timestamp,
           memobirdID: this.memobirdID,
         }, body),
-      }, (error, response, body) => {
-        if (error) {
-          reject({ error });
+      }, (error, response = {}, body) => {
+        if (error || response.statusCode !== 200) {
+          reject({ error, response });
         } else {
-          const { statusCode } = response || {};
-          if (statusCode !== 200) {
-            reject({ statusCode });
-          } else {
-            try {
-              const data = JSON.parse(body);
-              const { showapi_res_code, showapi_res_error } = data;
-              if (showapi_res_code !== 1) {
-                reject({ showapi_res_code, showapi_res_error });
-              } else {
-                resolve(data);
-              }
-            } catch(error) {
-              reject({ error });
+          try {
+            const data = JSON.parse(body);
+            const { showapi_res_code, showapi_res_error } = data;
+            if (showapi_res_code !== 1) {
+              reject({ showapi_res_code, showapi_res_error });
+            } else {
+              resolve(data);
             }
+          } catch(error) {
+            reject({ error });
           }
         }
       });
@@ -61,25 +92,31 @@ class Memobird {
   }
 
   // 账号关联
+  // user bind
   async init() {
-    if (!this.inited) {
-      const { showapi_userid } = await this.post('bind', { useridentifying: this.useridentifying });
-      this.userID = showapi_userid;
-      this.inited = true;
-    }
+    if (this.inited) return;
+    const { showapi_userid } = await this.post('bind', { useridentifying: this.useridentifying });
+    this.userID = showapi_userid;
+    this.inited = true;
   }
 
   // 获取纸条打印状态
+  // get print status
   async getPrintStatus(printcontentid) {
     const { printflag } = await this.post('watch', { printcontentid });
     return printflag;
   }
+
   // 延时一定时间后获取咕咕机打印状态
+  // get print status after a while
   async glance(printcontentid, delay = 1000) {
     await Memobird.sleep(delay);
-    return await this.getPrintStatus(printcontentid);
+    const printflag = await this.getPrintStatus(printcontentid);
+    return printflag;
   }
+
   // 监听打印状态
+  // keep getting print status until printed or timeout
   async watch(printcontentid, delay = 3000, maxDelay = 15000) {
     let printflag = 0;
     let totalDelay = 0;
@@ -92,10 +129,13 @@ class Memobird {
   }
 
   // 纸条打印
+  // print paper
   async print(...items) {
     // 参数不仅可以是字符串，还可以是未完成的encode操作生成的promise
+    // items can be not only base64 text data,
+    // but also promise that will return a base64 text data
     const printcontents = [];
-    for (let item of items) {
+    for (const item of items) {
       if (typeof item.then === 'function') {
         printcontents.push(await item);
       } else {
@@ -109,62 +149,82 @@ class Memobird {
 
   // 打印文字
   async printText(text) {
-    return await this.print(Memobird.encodeText(text));
+    const printcontentid = await this.print(this.encodeText(text));
+    return printcontentid;
   }
-  static encodeText(text) {
-    return `T:${iconv.encode(`${text}\n`, 'gbk').toString('base64')}`;
+  encodeText(text) {
+    return Memobird.formatText(iconv.encode(`${text}\n`, 'gbk').toString('base64'));
   }
 
-  // 打印Canvas
+  // 打印 Canvas
   async printCanvas(canvas) {
-    return await this.print(Memobird.encodeCanvas(canvas));
+    const printcontentid = await this.print(this.encodeCanvas(canvas));
+    return printcontentid;
   }
-  static encodeCanvas(canvas) {
+  encodeCanvas(canvas) {
     const binary = new Bmp(Bmp.BINARY, canvas);
-    return `P:${binary.getBase64(true)}`;
+    return Memobird.formatImage(binary.getBase64(true));
   }
 
-  // 根据图片路径打印
-  async printImage(imagePath, width) {
-    return await this.print(await Memobird.encodeImage(imagePath, width));
+  // 打印图片
+  async printImage(image, width) {
+    const printcontentid = await this.print(await this.encodeImage(image, width));
+    return printcontentid;
   }
-  static encodeImage(imagePath, width) {
-    return new Promise(function(resolve, reject) {
-      // 处理图片
-      function data2base64(data) {
-        gm(data).resize(width || 384).flip().type('Bilevel').colors(2).toBuffer('bmp', (error, buffer) => {
-          if (error) {
-            reject(error);
-          } else {
-            resolve(`P:${buffer.toString('base64')}`);
-          }
-        });
-      }
-      // 获取图片
-      if (/^data:image\/\w+;base64,/.test(imagePath)) {
-        // base64格式的图片
-        const base64Data = imagePath.replace(/^data:image\/\w+;base64,/, '');
-        const dataBuffer = new Buffer(base64Data, 'base64');
-        data2base64(dataBuffer);
-      } else if (imagePath.indexOf('http://') === -1 && imagePath.indexOf('https://') === -1) {
-        // 从本地路径获取
-        try {
-          fs.readFileSync(imagePath);
-          data2base64(imagePath);
-        } catch (error) {
-          reject(error);
-        }
-      } else {
-        // 从网络路径获取
-        request(imagePath, { encoding: null }, (error, response, bodyBuffer) => {
-          if (error) {
-            reject(error);
-          } else {
-            data2base64(bodyBuffer);
-          }
-        });
-      }
-    });
+  // convert jpeg or png image into signal color bmp image through Memobird's api
+  async remoteImageConversion(imgBase64String) {
+    const { result: signalColorBmpBase64Data } = await this.post('image', { imgBase64String });
+    return signalColorBmpBase64Data;
+  }
+  encodeImage(image, width) {
+    return width ? this.encodeImageLocally(image, width) : this.encodeImageRemotely(image);
+  }
+  // use Memobird's api to convert image format
+  async encodeImageRemotely(image) {
+    let base64Data;
+    if (/^data:image\/\w+;base64,/.test(image)) {
+      // image is a jpeg or png format picture's base64 data
+      base64Data = image.replace(/^data:image\/\w+;base64,/, '');
+    } else if (image.indexOf('http://') === -1 && image.indexOf('https://') === -1) {
+      // image is a path of local picture
+      base64Data = fs.readFileSync(image).toString('base64');
+    } else {
+      // image is a url of remote picture
+      const bodyBuffer = await Memobird.getImageDataFromUrl(image);
+      base64Data = bodyBuffer.toString('base64');
+    }
+    const signalColorBmpBase64Data = await this.remoteImageConversion(base64Data);
+    return Memobird.formatImage(signalColorBmpBase64Data);
+  }
+  // use graphicsmagick to convert image format
+  async encodeImageLocally(image, width) {
+    let signalColorBmpBase64Data;
+    if (/^data:image\/\w+;base64,/.test(image)) {
+      // image is a jpeg or png format picture's base64 data
+      const base64Data = image.replace(/^data:image\/\w+;base64,/, '');
+      const dataBuffer = Buffer.from(base64Data, 'base64');
+      signalColorBmpBase64Data = await Memobird.localImageConversion(dataBuffer, width);
+    } else if (image.indexOf('http://') === -1 && image.indexOf('https://') === -1) {
+      // image is a path of local picture
+      fs.accessSync(image, fs.constants.R_OK);
+      signalColorBmpBase64Data = await Memobird.localImageConversion(image, width);
+    } else {
+      // image is a url of remote picture
+      const bodyBuffer = await Memobird.getImageDataFromUrl(image);
+      signalColorBmpBase64Data = await Memobird.localImageConversion(bodyBuffer, width);
+    }
+    return Memobird.formatImage(signalColorBmpBase64Data);
+  }
+
+  async printUrl(printUrl) {
+    const { printcontentid } = await this.post('url', { userID: this.userID, printUrl });
+    return printcontentid;
+  }
+
+  async printHtml(printHtmlString) {
+    const printHtml = iconv.encode(printHtmlString, 'gbk').toString('base64');
+    const { printcontentid } = await this.post('html', { userID: this.userID, printHtml });
+    return printcontentid;
   }
 }
 
