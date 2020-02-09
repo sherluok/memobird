@@ -30,7 +30,7 @@ npm install memobird
 ### 初始化
 
 ```javascript
-const Memobird = require('Memobird');
+const Memobird = require('memobird');
 
 const memobird = new Memobird({
   ak: 'xxxxxxxxxxxxxxxx',
