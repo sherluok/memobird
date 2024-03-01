@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Canvas Example</title>
+  <style>
+    #canvas {
+      cursor: crosshair;
+    }
+  </style>
+</head>
+<body>
+  <script src="https://unpkg.com/binary-bmp/index.iife.js"></script>
+  <canvas id="canvas" width="384" height="300"></canvas>
+  <button id="submit" onclick="submit()">上传到服务器打印</button>
+  <img id="preview" />
+  <script>
+    const canvas = document.getElementById('canvas');
+    const width = 384 * window.devicePixelRatio;
+    const height = 300 * window.devicePixelRatio;
+    canvas.width = width;
+    canvas.height = height;
+
+    const ctx = canvas.getContext('2d');
+
+    // 背景
+    ctx.fillStyle = 'hsl(0 50% 90%)';
+    ctx.fillRect(0, 0, width, height);
+    // 边框
+    ctx.lineWidth = 10;
+    ctx.strokeStyle = 'hsl(220 50% 60%)';
+    ctx.strokeRect(0, 0, width, height);
+    // 标题
+    ctx.fillStyle = 'black';
+    ctx.font = 'bold 28px sans-serif';
+    ctx.fillText('鼠标移入按下绘画', 140, 60);
+    // 笑脸
+    ctx.beginPath();
+    ctx.arc(75, 75, 50, 0, Math.PI * 2, true); // Outer circle
+    ctx.moveTo(110, 75);
+    ctx.arc(75, 75, 35, 0, Math.PI, false); // Mouth (clockwise)
+    ctx.moveTo(65, 65);
+    ctx.arc(60, 65, 5, 0, Math.PI * 2, true); // Left eye
+    ctx.moveTo(95, 65);
+    ctx.arc(90, 65, 5, 0, Math.PI * 2, true); // Right eye
+    ctx.lineWidth = 5;
+    ctx.strokeStyle = 'hsl(220 50% 60%)';
+    ctx.stroke();
+
+    // 画笔
+    canvas.addEventListener('mousedown', () => {
+      canvas.addEventListener('mousemove', onMouseMove);
+      window.addEventListener('mouseup', onMouseUp);
+    });
+    function onMouseMove(e) {
+      ctx.fillRect(e.offsetX, e.offsetY, 5, 5);
+    }
+    function onMouseUp(e) {
+      window.removeEventListener('mouseup', onMouseUp);
+      canvas.removeEventListener('mousemove', onMouseMove);
+    }
+    // 上传按钮
+    function submit() {
+      const { Bits, Bitmap } = window.Bmp;
+      const uint8Array = Bitmap.fromCanvas(canvas).bits(Bits.BINARY).flip().uint8Array();
+      fetch('/print-binary-bmp', { method: 'POST', body: uint8Array }).then((res) => res.json()).then(console.log);
+    }
+  </script>
+</body>
+</html>
