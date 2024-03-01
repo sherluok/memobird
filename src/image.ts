@@ -11,7 +11,6 @@ export function fetchImage(src: string): Buffer | Promise<Buffer> {
   } else {
     return readFile(src);
   }
-  // throw new Error(`Unknow image src type: ${JSON.stringify(src)}`);
 }
 
 export async function sharpImage(input: Buffer, resizeToWidth: number): Promise<Uint8Array> {
@@ -28,14 +27,13 @@ export async function sharpImage(input: Buffer, resizeToWidth: number): Promise<
 
   const { info: { width, height, channels }, data } = raw;
 
-  if (channels !== 4 || data.byteLength !== width * height * 4) {
-    throw new Error('Cannot convert input image into rgba channels!');
+  if (channels === 3 && data.byteLength === width * height * 3) {
+    return new Bitmap({ bits: Bits.RGB, width, height, data }).bits(Bits.BINARY).uint8Array();
   }
 
-  return new Bitmap({
-    bits: Bits.RGBA,
-    width,
-    height,
-    data,
-  }).uint8Array();
+  if (channels === 4 && data.byteLength === width * height * 4) {
+    return new Bitmap({ bits: Bits.RGBA, width, height, data }).bits(Bits.BINARY).uint8Array();
+  }
+
+  throw new Error('Cannot convert input image into RGBA/RGB channels!');
 }
